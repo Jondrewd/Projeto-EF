@@ -24,11 +24,9 @@ public class UserService implements UserDetailsService{
         return users;
     }
 
-
     public User insert(User obj) {
         return userRepository.save(obj);
     }
-
 
     public User update(Integer id, User obj) {
         Optional<User> newObj = userRepository.findById(id);
