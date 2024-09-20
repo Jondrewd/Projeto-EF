@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.estagio.domain.User;
+import com.example.estagio.exceptions.ResourceNotFoundException;
 import com.example.estagio.repository.UserRepository;
 
 @Service
@@ -23,9 +24,18 @@ public class UserService implements UserDetailsService{
         Page<User> users = userRepository.findAll(pageable);
         return users;
     }
+        public User findById(Integer id){
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Objeto não encontrado."));
+        return user;
+    }
 
     public User insert(User obj) {
         return userRepository.save(obj);
+    }
+    public void delete(Integer id) {
+        findById(id);
+        userRepository.deleteById(id);
     }
 
     public User update(Integer id, User obj) {
@@ -38,11 +48,7 @@ public class UserService implements UserDetailsService{
     public void updateUser(User user, User obj) {
         user.setUsername(obj.getUsername());
     }
-
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
+    
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         var user = userRepository.findByUsername(username);
