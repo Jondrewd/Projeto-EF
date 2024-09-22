@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.estagio.dto.AccountCredentialsDTO;
+import com.example.estagio.repository.UserRepository;
 import com.example.estagio.services.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,9 +22,24 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    
+
     @Autowired
-    AuthService authService;
+    private AuthService authService;
+    @Autowired
+    private UserRepository repository;
+
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@RequestBody AccountCredentialsDTO data){
+        if (checkParamIsNotNull(data)) 
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request.");
+        
+        if (checkUsername(data.getUsername()) == true){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request.");
+        } else{
+            authService.register(data);
+            return new ResponseEntity<>("Usuario registrado", HttpStatus.OK);
+        }
+    }
 
     @SuppressWarnings("rawtypes")
     @Operation(summary = "Authenticates a user and returns a token.")
@@ -57,5 +73,12 @@ public class AuthController {
     private boolean checkParamIsNotNull(AccountCredentialsDTO data){
         return data == null || data.getUsername() == null || data.getUsername().isBlank() ||
         data.getPassword() == null || data.getPassword().isBlank();
+    }
+    private boolean checkUsername(String name){
+        if (repository.findByUsername(name) == null){ 
+            return false;
+        }else{
+            return true;
+        }
     }
 }
