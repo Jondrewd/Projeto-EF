@@ -16,7 +16,7 @@ public class Permission implements GrantedAuthority{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String description;
+    private String name;
 
     public Permission() {}
 
@@ -32,17 +32,17 @@ public class Permission implements GrantedAuthority{
         this.id = id;
     }
 
-    public String getDescription() {
-        return description;
+    public String getName() {
+        return name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
     public String getAuthority() {
-        return this.description;
+        return this.name;
     }
 
     @Override
