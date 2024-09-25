@@ -2,16 +2,10 @@ package com.example.estagio.domain;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,16 +42,16 @@ public class User implements UserDetails{
     private List<Order> orders;
 
     @Column(name = "account_non_expired")
-    private boolean accountNonExpired;
+    private boolean accountNonExpired = true;
 
     @Column(name = "account_non_locked")
-    private boolean accountNonLocked;
+    private boolean accountNonLocked = true;
 
     @Column(name = "credentials_non_expired")
-    private boolean credentialsNonExpired;
+    private boolean credentialsNonExpired = true;
 
     @Column(name = "enabled")
-    private boolean enabled;
+    private boolean enabled = true;
     
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_permission", joinColumns = {@JoinColumn(name = "id_user")},
@@ -88,12 +82,7 @@ public class User implements UserDetails{
     }
 
     public void setPassowrd(String password){
-        Pbkdf2PasswordEncoder pbkdf2Encoder = new Pbkdf2PasswordEncoder("", 8, 185000, SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
-		Map<String, PasswordEncoder> encoders = new HashMap<>(); 
-		encoders.put("pbkdf2", pbkdf2Encoder);
-		DelegatingPasswordEncoder passwordEncoder = new DelegatingPasswordEncoder("pbkdf2", encoders);
-		passwordEncoder.setDefaultPasswordEncoderForMatches(pbkdf2Encoder);
-        this.password = passwordEncoder.encode(password);
+        this.password = password;
     }
 
     public String getFullName() {
@@ -107,11 +96,14 @@ public class User implements UserDetails{
     public void setUsername(String username) {
         this.username = username;
     }
+    public void setPermission(List<Permission> permission){
+        this.permissions = permission;
+    }
 
     public List<String> getRoles(){
         List<String> roles = new ArrayList<>();
         for (Permission x : permissions) {
-          roles.add(x.getDescription());  
+          roles.add(x.getName());  
         }
         return roles;
     }
